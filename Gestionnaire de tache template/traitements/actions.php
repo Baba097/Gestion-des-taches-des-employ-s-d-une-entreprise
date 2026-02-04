@@ -5,6 +5,30 @@ $dossierpage = "http://localhost/php%20project/Gestionnaire%20de%20tache%20templ
 
 /****FORMULAIRE ****/
 
+//ENREGISTREMENT JSON
+function enrgJson($titre,$description,$priorite,$date_limite,$responsable){
+        
+    $fichier = "taches.json";
+
+    //Lire le fichier
+    if (file_exists($fichier)) {
+        $contenu = file_get_contents($fichier);
+        $tasks = json_decode($contenu, true);
+    } else {
+        $tasks = [];
+    }
+
+    //Nouvelle tache
+    $newTasks = ['titre'=>$titre,'description'=>$description,'priorite'=>$priorite,'date_limite'=>$date_limite,'responsable'=>$responsable]; 
+
+    //Ajouter tache
+    $tasks[] = $newTasks;
+
+    //Réécrire le fichier
+    file_put_contents($fichier, json_encode($tasks, JSON_PRETTY_PRINT));  
+}
+
+
 // AJOUTER LES TACHES 
 if(isset($_POST['action']) && $_POST['action'] === 'ajouter')
 {
@@ -17,6 +41,7 @@ if(isset($_POST['action']) && $_POST['action'] === 'ajouter')
     $page = $_POST['page'];
 
     addTaches($titre,$description,$priorite,$statut,$date_limite,$responsable);
+    enrgJson($titre,$description,$priorite,$date_limite,$responsable);
 
     header("Location: $dossierpage$page");
     exit;
@@ -122,5 +147,6 @@ $taches_filtrer = filtrer($search,$statut,$priorite);
 $nbrTachesTerminé = count(getTachesTerminer());
 $nbrTachesNonTerminé = count(getTachesNonTerminer());
 $nbrTachesEnRetard = count(getTachesEnRetard());
+
 
 ?>
